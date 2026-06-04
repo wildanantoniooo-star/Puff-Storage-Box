@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puff Storage Box</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #4a2017; /* Classic Vintage Tone */
+            --accent: #C5A059; /* Muted Gold */
+            --bg-body: #EDEADB; /* Rich Antique Paper */
+            --bg-container: #FDFCF9; /* Lighter Cream */
+            --text-main: #242221; 
+            --text-muted: #64615E;
+            --border: #CFC9B8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); -webkit-font-smoothing: antialiased; }
+        .container { max-width: 500px; margin: 0 auto; background: var(--bg-container); min-height: 100vh; position: relative; border-left: 1px solid rgba(0,0,0,0.12); border-right: 1px solid rgba(0,0,0,0.12); box-shadow: 0 0 40px rgba(0,0,0,0.08); }
+        
+        .product-swiper { width: 100%; aspect-ratio: 1/1; background: #E5E1D2; border-bottom: 3px double var(--border); position: relative; }
+        .product-swiper::after { content: ''; position: absolute; inset: 0; pointer-events: none; border: 14px solid var(--bg-container); z-index: 5; }
+        
+        /* Flash Sale bar - Vintage Ribbon */
+        .flash-sale-bar { background: var(--text-main); color: var(--bg-container); display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 4px double var(--accent); position: relative; z-index: 10; }
+        .fs-left { display: flex; flex-direction: column; }
+        .fs-label { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; text-transform: uppercase; font-style: italic; letter-spacing: 1.5px; color: var(--accent); }
+        .fs-subtext { font-size: 9px; font-weight: 700; opacity: 0.9; letter-spacing: 2px; color: var(--bg-container); text-transform: uppercase; margin-top: 3px; }
+        .fs-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
+        .fs-timer-label { font-family: 'Playfair Display', serif; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--border); font-style: italic; }
+        .timer-box { background: transparent; color: var(--accent); padding: 0; font-size: 15px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 1.5px; }
+        
+        .p-info { padding: 40px 24px 28px; background: transparent; position: relative; text-align: center; }
+        .p-price-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 18px; }
+        .p-price-now { font-family: 'Playfair Display', serif; font-size: 2.8rem; color: var(--primary); font-weight: 700; line-height: 1; }
+        .p-price-was { font-size: 1.1rem; color: var(--text-muted); text-decoration: line-through; font-family: 'Playfair Display', serif; font-style: italic; }
+        .p-discount-tag { background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 5px 10px; text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 2px 2px 0 rgba(0,0,0,0.15); font-family: 'Plus Jakarta Sans', sans-serif; }
+        .p-title { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 700; line-height: 1.3; margin-bottom: 22px; color: var(--text-main); letter-spacing: -0.5px; }
+        
+        /* Store Section Bar */
+        .shop-section { display: flex; align-items: center; gap: 16px; padding: 22px 24px; margin: 0; background: var(--bg-body); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .shop-logo { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); filter: sepia(0.25) contrast(1.1); padding: 3px; background: var(--bg-container); }
+        .shop-info { flex: 1; }
+        .shop-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .shop-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-style: italic; font-family: 'Playfair Display', serif; }
+        
+        .s-section { padding: 36px 24px; border-bottom: 1px solid var(--border); background: transparent; }
+        .s-section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-bottom: 26px; display: inline-block; }
+        
+        /* Horizontal Variants Scroll */
+        .variant-scroll-container { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
+        .variant-scroll-container::-webkit-scrollbar { display: none; }
+        .variant-card { flex: 0 0 115px; border: 1px solid var(--border); padding: 7px; position: relative; cursor: pointer; transition: 0.3s; background: var(--bg-container); }
+        .v-card-img { width: 100%; aspect-ratio: 1/1; overflow: hidden; margin-bottom: 10px; border: 1px solid var(--border); }
+        .v-card-img img { width: 100%; height: 100%; object-fit: cover; filter: sepia(0.2) contrast(1.05); transition: 0.5s; }
+        .variant-card:hover .v-card-img img { filter: sepia(0) contrast(1.1); transform: scale(1.05); }
+        .v-card-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; text-align: center; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .v-check { position: absolute; top: 0; right: 0; background: var(--accent); color: #fff; width: 22px; height: 22px; font-size: 10px; display: none; align-items: center; justify-content: center; z-index: 2; border-bottom-left-radius: 2px; }
+        .variant-card.active { border-color: var(--primary); padding: 6px; border-width: 2px; box-shadow: 4px 4px 0 rgba(var(--primary), 0.1); }
+        .variant-card.active .v-card-name { color: var(--primary); }
+        .variant-card.active .v-check { display: flex; }
+        
+        .shipping-box { display: flex; align-items: center; gap: 16px; padding: 24px; background: rgba(197, 160, 89, 0.06); border-bottom: 1px solid var(--border); cursor: pointer; }
+        .shipping-icon { color: var(--accent); font-size: 22px; }
+        .shipping-text { flex: 1; }
+        .shipping-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; font-style: italic; }
+        .shipping-desc { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        
+        /* Features Section */
+        .s-section-features { background: transparent; border-bottom: 1px solid var(--border); padding: 40px 0; }
+        .vintage-divider { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--accent); letter-spacing: 2px; margin-bottom: 32px; text-transform: uppercase; }
+        .features-vertical-list { display: flex; flex-direction: column; gap: 0; }
+        .feature-vertical-item { padding: 0 24px 36px; border-bottom: 1px dashed var(--border); margin-bottom: 36px; }
+        .feature-vertical-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .feature-img-large { width: 100%; height: auto; display: block; filter: sepia(0.18) contrast(1.05); border: 8px solid var(--bg-body); box-shadow: 0 5px 18px rgba(0,0,0,0.06); margin-bottom: 24px; }
+        .feature-content-large { padding: 0; text-align: center; }
+        .feature-title-large { font-family: 'Playfair Display', serif; font-size: 23px; font-weight: 700; color: var(--primary); margin-bottom: 12px; line-height: 1.25; }
+        .feature-desc-large { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13.5px; color: var(--text-muted); line-height: 1.7; font-weight: 500; }
+        
+        .dropdown-trigger { padding: 24px; display: flex; justify-content: space-between; align-items: center; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; color: var(--text-main); border-bottom: 1px solid var(--border); background: var(--bg-body); transition: background 0.2s; }
+        .dropdown-trigger:hover { background: #E4DFD2; }
+        .dropdown-content { padding: 0 24px 36px; font-size: 14px; color: var(--text-main); white-space: pre-wrap; line-height: 1.8; display: none; background: transparent; font-weight: 500; }
+        .dropdown-content.active { display: block; padding-top: 24px; }
+        
+        .s-testimonial-item { padding: 24px 0; border-bottom: 1px dashed var(--border); }
+        .s-testimonial-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .st-header { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px; }
+        .st-avatar { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border); filter: sepia(0.2); }
+        .st-user-info { flex: 1; }
+        .st-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .st-stars { color: var(--accent); font-size: 11px; margin: 4px 0; letter-spacing: 2.5px; }
+        .st-meta { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; }
+        .st-text { font-size: 16px; color: var(--text-main); line-height: 1.7; margin-bottom: 16px; font-style: italic; font-family: 'Playfair Display', serif; }
+        .st-media img { width: 84px; height: 84px; object-fit: cover; border: 4px solid var(--bg-body); box-shadow: 0 3px 10px rgba(0,0,0,0.06); filter: sepia(0.12); }
+        
+        .lightbox { position: fixed; inset: 0; background: rgba(30, 28, 27, 0.96); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .lightbox-container { background: transparent; padding: 0; width: 100%; max-width: 450px; position: relative; }
+        .lightbox img { width: 100%; height: auto; display: block; border: 10px solid var(--bg-body); box-shadow: 0 25px 60px rgba(0,0,0,0.7); }
+        .lightbox-close { position: absolute; top: -50px; right: 0; color: var(--bg-body); font-size: 36px; cursor: pointer; transition: 0.2s; }
+        
+        /* Variant Summary styles */
+        .summary-card { display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--border); margin-bottom: 24px; background: var(--bg-body); box-shadow: 4px 4px 0 rgba(0,0,0,0.05); }
+        .summary-img { width: 56px; height: 56px; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; padding: 2px; background: var(--bg-container); }
+        .summary-info { flex: 1; min-width: 0; }
+        .summary-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .summary-variant-name { font-size: 10px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Related Products Section */
+        .related-swiper { padding: 10px 0 20px; }
+        .related-card { border: 1px solid var(--border); background: var(--bg-body); height: 100%; display: flex; flex-direction: column; transition: all 0.3s; box-shadow: 4px 4px 0 rgba(0,0,0,0.04); }
+        .related-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.3); }
+        .related-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; filter: sepia(0.15); border-bottom: 1px solid var(--border); padding: 4px; background: var(--bg-container); }
+        .related-info { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; text-align: center; }
+        .related-name { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: var(--text-main); height: 40px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+        .related-price-row { display: flex; flex-direction: column; align-items: center; }
+        .related-price-now { font-size: 15px; font-weight: 700; color: var(--primary); font-family: 'Playfair Display', serif; }
+        .related-price-was { font-size: 11px; color: var(--text-muted); text-decoration: line-through; font-family: 'Playfair Display', serif; font-style: italic; }
+        .related-btn { margin-top: 12px; font-size: 10px; font-weight: 700; color: var(--bg-container); padding: 10px; text-transform: uppercase; letter-spacing: 2px; background: var(--text-main); transition: 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .related-card:hover .related-btn { background: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="swiper product-swiper" id="main-slider"><div class="swiper-wrapper"><div class="swiper-slide"><img src="https://ae-pic-a1.aliexpress-media.com/kf/Se8e9ba43bd9c4c848d31428b260f46c1v.png" id="main-product-img" style="width:100%; height:100%; object-fit:contain;"></div></div><div class="swiper-pagination"></div></div>
+        
+        
+        <div class="flash-sale-bar" style="background: #4a2017; border-bottom: 3px double var(--accent);">
+            <div class="fs-left">
+                <div class="fs-label">FLASH SALE! STOK TERBATAS</div>
+                <div class="fs-subtext">PENAWARAN KLASIK TERBATAS</div>
+            </div>
+            <div class="fs-right">
+                <div class="fs-timer-label"><i class="fas fa-clock"></i> BERAKHIR DALAM</div>
+                <div class="timer-box" id="timer">00 : 00 : 00</div>
+            </div>
+        </div>
+
+        <div class="p-info">
+            <h1 class="p-title">Puff Storage Box</h1>
+            <div class="p-price-row">
+                <span class="p-price-now" id="display-price">Rp 170.000</span>
+                
+                <span class="p-price-was">Rp 350.000</span>
+                <span class="p-discount-tag">HEMAT 51%</span>
+            </div>
+            
+            
+            <div style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; justify-content:center; gap:12px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 1px;">
+                <span><span style="color:var(--accent)">★</span> 4.9</span>
+                <span style="color:var(--border)">|</span> 
+                <span>1.2RB ULASAN</span>
+                <span style="color:var(--border)">|</span> 
+                <span>2.5RB+ TERJUAL</span>
+            </div>
+        </div>
+
+        <!-- Store Info Section -->
+        <div class="shop-section">
+            <img src="https://cdn.orderonline.id/uploads/images_3462981776422092123.jpg" class="shop-logo">
+            <div class="shop-info">
+                <div class="shop-name">DUNIA BELANJA ONLINE</div>
+                <div class="shop-meta">Aktif &bull; Pengiriman dari Kota Jakarta</div>
+            </div>
+        </div>
+
+        
+        <div class="s-section" style="border-top: 1px double var(--border); border-bottom: 1px double var(--border);">
+            <div class="s-section-header">
+                <div class="s-section-title">Pilihan Katalog: <span id="selected-variant-name" style="color:#4a2017; font-weight:700; font-family: 'Playfair Display', serif; font-style: italic;"></span></div>
+            </div>
+            <div class="variant-scroll-container">
+                
+                    <div class="variant-card active" onclick="selectVariant(this, '170000', '𝗞𝗨𝗡𝗜𝗡𝗚', 'https://ae-pic-a1.aliexpress-media.com/kf/Sa5a5a84f179344d5919551594824a8373.jpg')">
+                        <div class="v-card-img">
+                            <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sa5a5a84f179344d5919551594824a8373.jpg">
+                        </div>
+                        <div class="v-card-name">𝗞𝗨𝗡𝗜𝗡𝗚</div>
+                        <div class="v-check"><i class="fas fa-check"></i></div>
+                    </div>
+                
+                    <div class="variant-card " onclick="selectVariant(this, '170000', '𝗖𝗢𝗞𝗟𝗔𝗧', 'https://ae-pic-a1.aliexpress-media.com/kf/S31ba8148024e40af92af640e30901fa4w.jpg')">
+                        <div class="v-card-img">
+                            <img src="https://ae-pic-a1.aliexpress-media.com/kf/S31ba8148024e40af92af640e30901fa4w.jpg">
+                        </div>
+                        <div class="v-card-name">𝗖𝗢𝗞𝗟𝗔𝗧</div>
+                        <div class="v-check"><i class="fas fa-check"></i></div>
+                    </div>
+                
+                    <div class="variant-card " onclick="selectVariant(this, '170000', '𝗣𝗜𝗡𝗞 ', 'https://ae-pic-a1.aliexpress-media.com/kf/S26add991f31e48cb8b0bb4c574a7a41d6.jpg')">
+                        <div class="v-card-img">
+                            <img src="https://ae-pic-a1.aliexpress-media.com/kf/S26add991f31e48cb8b0bb4c574a7a41d6.jpg">
+                        </div>
+                        <div class="v-card-name">𝗣𝗜𝗡𝗞 </div>
+                        <div class="v-check"><i class="fas fa-check"></i></div>
+                    </div>
+                
+            </div>
+        </div>
+
+        <div class="shipping-box" onclick="scrollToOrder()">
+            <div class="shipping-icon"><i class="fas fa-truck-fast"></i></div>
+            <div class="shipping-text">
+                <div class="shipping-title" id="dynamic-shipping-date">Garansi Tiba: ...</div>
+                <div class="shipping-desc">Dapatkan Jaminan Ongkir s/d 20RB</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:var(--border); font-size:14px;"></i>
+        </div>
+
+        <div style="background: transparent;">
+            <div class="dropdown-trigger active" onclick="toggleDropdown(this)">DESKRIPSI PRODUK <i class="fas fa-chevron-down"></i></div>
+            <div class="dropdown-content active">💄 Puff Storage Box adalah organizer praktis dengan desain dua lapis untuk menyimpan powder puff, perhiasan, anting, dan aksesori kecil lainnya. Ringan, portabel, serta membantu menjaga barang tetap bersih dan rapi.</div>
+            
+            <div class="dropdown-trigger" onclick="toggleDropdown(this)">SPESIFIKASI TEKNIS <i class="fas fa-chevron-down"></i></div>
+            <div class="dropdown-content">Bahan: Premium Quality
+Stok: Tersedia
+Garansi: 100% Original</div>
+        </div>
+
+        
+        <div class="s-section-features">
+            <div class="vintage-divider">❖ &bull; FEATURED HIGHLIGHTS &bull; ❖</div>
+            <div class="features-vertical-list">
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/Se8e9ba43bd9c4c848d31428b260f46c1v.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sf9263705ca4a4f4f9feffd0e616ca2f7Z.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sbf6bd6901154415caf37a6229b479a5dn.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sae1280646ac74a06b533173156bf4207S.gif" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/S689e675239d14baba4c0dc97c45e3b6ai.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sf25b7f99cdc34c5ea7b0133156a3c116i.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/S6e74ab4a44db40ecaf63f34b13c79c387.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/S8aee1d3d34d64cef97a52bba007fc3afE.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/S62e24daf930442fb8699ab8144d5387d3.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sa81ddd5159c44155936e5a7008379c7bh.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sa77ae1d9d14f4a1f97ee3012119158f8s.gif" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sec24001e9a65470ba07827229e00514fT.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/S0ee62d5e59814f019c1de9f827a217110.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/S044bfa24cfd640e2a28c2eb0a67bc5fcG.png" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+                    <div class="feature-vertical-item">
+                        <img src="https://ae-pic-a1.aliexpress-media.com/kf/S319cb63ffee1412c8daca6cd98e7bdb1i.gif" class="feature-img-large">
+                        <div class="feature-content-large">
+                            <div class="feature-title-large"></div>
+                            <div class="feature-desc-large"></div>
+                        </div>
+                    </div>
+                
+            </div>
+        </div>
+
+        
+
+        <div id="order-section" style="padding:48px 24px; background:var(--bg-body); border-top: 1px solid var(--border);">
+            <div id="variant-summary"></div>
+            <h3 style="text-align:center; font-family:'Playfair Display', serif; font-weight:700; color:var(--text-main); font-size:24px; margin-bottom:32px; letter-spacing:1px; line-height: 1.2;">Formulir Pemesanan<br><span style="font-size: 13px; color: var(--text-muted); font-family: 'Plus Jakarta Sans', sans-serif; font-style: italic; letter-spacing: 0; font-weight: 500; text-transform:none;">Isi data di bawah ini untuk memesan</span></h3>
+            <!-- OrderOnline Embed Code - v8.0.2 --> <div class="ooef"> <form class="orderonline-embed-form" data-username="emma" data-product-slug="puff-storage-box" data-product-id="6a217fd09b5faabe8807fafd" id="oo-embed-form-puff-storage-box-4094" data-origin="orderonline"> <div class="ooef-loader"><style>.ooef-loader{visibility: hidden;opacity: 0;position: absolute;left: 0;right: 0;top: 0;bottom: 0;display: flex;justify-content: center;align-items: center;flex-direction: column;animation: ooLoadingIn 10s ease;-webkit-animation: ooLoadingIn 10s ease;animation-fill-mode: forwards;overflow: hidden}@keyframes ooLoadingIn{0%{visibility: hidden;opacity: 0}20%{visibility: visible;opacity: 0}100%{visibility: visible;opacity: 1}}@-webkit-keyframes ooLoadingIn{0%{visibility: hidden;opacity: 0}20%{visibility: visible;opacity: 0}100%{visibility: visible;opacity: 1}}.ooef-loader>div,.ooef-loader>div:after{border-radius: 50%;width: 2.5rem;height: 2.5rem}.ooef-loader>div{font-size: 10px;position: relative;text-indent: -9999em;border: .25rem solid #f5f5f5;border-left: .25rem solid #55c4cf;-webkit-transform: translateZ(0);-ms-transform: translateZ(0);transform: translateZ(0);-webkit-animation: ooLoading 1.1s infinite linear;animation: ooLoading 1.1s infinite linear}.ooef-loader.error>div{border-left: .25rem solid #ff4500;animation-duration: 5s}@-webkit-keyframes ooLoading{0%{-webkit-transform: rotate(0);transform: rotate(0)}100%{-webkit-transform: rotate(360deg);transform: rotate(360deg)}}@keyframes ooLoading{0%{-webkit-transform: rotate(0);transform: rotate(0)}100%{-webkit-transform: rotate(360deg);transform: rotate(360deg)}}</style><div aria-live="polite" role="status"><div>Loading...</div></div></div> </form> </div> <script> if (typeof xLogError != 'function') { var xLogError = function (error) { var req = new XMLHttpRequest(); var payload = JSON.stringify({ url: document.location.href, line: error.line, stack: error.stack }); var params = 'message=' + encodeURIComponent(error.name) + '&payload=' + encodeURIComponent(payload) + '&type=embed&level=error'; req.open('POST', 'https://api.orderonline.id/log', true); req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded'); req.send(params); }; } try { if (typeof xEmbedScript != 'function') { var xEmbedScript = function () { !function(w, d, e, v, id, t, s) { if (d.getElementById(id)) return; t = d.createElement(e);t.async = !0;t.src = v;t.id = id; s = d.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); }(window, document, 'script', 'https://cdn.orderonline.id/js/embed-v2-slim.min.js?v=8.0.2', 'oo-embed-js'); }; } if (typeof xEmbedInit != 'function') { var xEmbedInit = function (w, n) { if (w.ooe) return; n = w.ooe = function() { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments) }; if (!w._ooe) w._ooe = n; n.push = n;n.loaded = !0;n.version = '8.0.2';n.queue = []; }; } xEmbedInit(window); ooe('setup', 'redirect', 'https://emma.orderonline.id'); ooe('init', '5f16831a9d8e8e4fb67472e5', '6a217fd09b5faabe8807fafd', '6a217fd09b5faabe8807fafe', 'oo-embed-form-puff-storage-box-4094', {"mode":"page","action":"Klik untuk pemesanan","title":"Form Pemesanan","triggerPixel":true,"triggerGtm":false}); if (!window.jQuery) { !function(w, d, e, v, id, t, s) { if (d.getElementById(id)) return; t = d.createElement(e);t.async = !0;t.src = v;t.id = id; t.addEventListener('load', xEmbedScript); s = d.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); }(window, document, 'script', 'https://cdn.orderonline.id/js/vendor/jquery.min.js', 'oo-embed-jquery'); } else { xEmbedScript(); } } catch (e) { xLogError(e); throw e; } </script> <!-- End OrderOnline Embed Code -->
+        </div>
+
+        
+    </div>
+    
+    <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+        <div class="lightbox-container" onclick="event.stopPropagation()">
+            <span class="lightbox-close" onclick="document.getElementById('lightbox').style.display='none'">&times;</span>
+            <img id="lightbox-img">
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        const mainSwiper = new Swiper('#main-slider', { 
+            pagination: { el: '.swiper-pagination', clickable: true },
+            autoplay: { delay: 5000, disableOnInteraction: false }
+        });
+
+        const videos = document.querySelectorAll('.slide-video');
+        videos.forEach(video => {
+          video.onplay = () => mainSwiper.autoplay.stop();
+          video.onended = () => {
+            mainSwiper.slideNext();
+            mainSwiper.autoplay.start();
+          };
+          video.onpause = () => {
+            if(!video.ended) mainSwiper.autoplay.start();
+          };
+        });
+
+        function selectVariant(el, price, name, image) {
+            document.querySelectorAll('.variant-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('selected-variant-name').innerText = name;
+            
+            if(price) document.getElementById('display-price').innerText = 'Rp ' + Number(price).toLocaleString('id-ID');
+            
+            if (image) {
+                const mainImg = document.getElementById('main-product-img');
+                if (mainImg) {
+                    mainImg.src = image;
+                    const targetIndex = 0;
+                    if (mainSwiper) mainSwiper.slideTo(targetIndex);
+                }
+            }
+
+            const summary = document.getElementById('variant-summary');
+            if (summary) {
+              summary.innerHTML = `
+                <div class="summary-card">
+                    <img src="${image}" class="summary-img">
+                    <div class="summary-info">
+                        <div class="summary-title">Puff Storage Box</div>
+                        <div class="summary-variant-name">${name}</div>
+                    </div>
+                </div>`;
+            }
+        }
+
+        function toggleDropdown(el) { el.classList.toggle('active'); el.nextElementSibling.classList.toggle('active'); }
+        function scrollToOrder() { 
+          const target = document.getElementById('order-section');
+          if (target) target.scrollIntoView({ behavior: 'smooth' }); 
+        }
+        function openLightbox(src) { 
+          const img = document.getElementById('lightbox-img');
+          if (img) img.src = src; 
+          const lb = document.getElementById('lightbox');
+          if (lb) lb.style.display = 'flex'; 
+        }
+        
+        function updateShippingDate() {
+            const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+            const today = new Date();
+            const start = new Date(today);
+            start.setDate(today.getDate() + 3);
+            const end = new Date(today);
+            end.setDate(today.getDate() + 6);
+            
+            let dateStr = "";
+            if (start.getMonth() === end.getMonth()) {
+                dateStr = start.getDate() + " - " + end.getDate() + " " + months[start.getMonth()];
+            } else {
+                dateStr = start.getDate() + " " + months[start.getMonth()] + " - " + end.getDate() + " " + months[end.getMonth()];
+            }
+            
+            const el = document.getElementById('dynamic-shipping-date');
+            if (el) el.innerText = "Garansi Tiba: " + dateStr;
+        }
+
+        function updateReviewDates() {
+            const els = document.querySelectorAll('.dynamic-date');
+            els.forEach(el => {
+                const daysAgo = parseInt(el.getAttribute('data-days-ago')) || 0;
+                const date = new Date();
+                date.setDate(date.getDate() - daysAgo);
+                
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                
+                el.innerText = day + '/' + month + '/' + year;
+            });
+        }
+
+        function startTimer(duration, display) {
+            let timer = duration, hours, minutes, seconds;
+            setInterval(function () {
+                hours = Math.floor(timer / 3600);
+                minutes = Math.floor((timer % 3600) / 60);
+                seconds = Math.floor(timer % 60);
+
+                const hDisplay = hours < 10 ? "0" + hours : hours;
+                const mDisplay = minutes < 10 ? "0" + minutes : minutes;
+                const sDisplay = seconds < 10 ? "0" + seconds : seconds;
+
+                if (display) display.textContent = hDisplay + " : " + mDisplay + " : " + sDisplay;
+
+                if (--timer < 0) {
+                    timer = duration;
+                }
+            }, 1000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateShippingDate();
+            updateReviewDates();
+            
+            const firstVariant = document.querySelector('.variant-card');
+            if(firstVariant) (firstVariant).click();
+
+            const timerDisplay = document.querySelector('#timer');
+            if(timerDisplay) {
+                const durationHours = 1;
+                startTimer(3600 * durationHours, timerDisplay);
+            }
+
+            if (document.querySelector('.related-swiper')) {
+                new Swiper('.related-swiper', {
+                    slidesPerView: 'auto',
+                    spaceBetween: 15,
+                    freeMode: true,
+                    autoplay: { delay: 3000, disableOnInteraction: false },
+                });
+            }
+        });
+    </script>
+</body>
+</html>
